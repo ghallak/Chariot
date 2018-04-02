@@ -132,7 +132,7 @@ impl GridPartition {
     }
 
     pub fn query_single_cell(&self, cell_world_pos: &Vector2<i32>) -> HashSet<u32> {
-        if let Some(cell) = self.cell(CellKey::new(cell_world_pos.x, cell_world_pos.y)) {
+        if let Some(cell) = self.cell(self.cell_key(&cell_world_pos)) {
             cell.entities().iter().map(|ge| ge.entity_id).collect::<HashSet<_>>()
         } else {
             HashSet::new()
