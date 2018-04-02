@@ -48,6 +48,7 @@ use specs::{self, Join};
 use super::System;
 use types::{Fixed, Vector3};
 use util::unit as unit_util;
+use nalgebra::Vector2;
 
 pub struct UnitSelectionSystem {
     empires: dat::EmpiresDbRef,
@@ -89,8 +90,7 @@ impl System for UnitSelectionSystem {
         ]);
 
         let mouse_ray = calculate_mouse_ray(&viewport_rc, &mouse_state_rc, &view_projector_rc, &terrain_rc);
-        // TODO
-        //let entity_ids_in_cell = grid.query_single_cell(mouse_ray.world_coord)
+        let entity_ids_in_cell = grid.query_single_cell(&Vector2::new(mouse_ray.world_coord.x.into(), mouse_ray.world_coord.y.into()));
 
         let mut cursor_over_targetable_entity = false;
 
@@ -111,6 +111,11 @@ impl System for UnitSelectionSystem {
 
             'f_on_screen: for (entity_other, trans_other, unit_other, _on_screen) in (&entities, &transforms_comp, &units_comp, &on_screen_comp).iter() {
                 let entity_id_other = entity_other.get_id();
+
+                if !entity_ids_in_cell.contains(&entity_id_other) {
+                    //log!("on-screen unit {} is not the cell under the cursor", entity_id_other);
+                    continue 'f_on_screen;
+                }
 
                 if entity_id == entity_id_other {
                     //log!("on-screen unit {} is the same as a currently-selected unit", entity_id_other);
